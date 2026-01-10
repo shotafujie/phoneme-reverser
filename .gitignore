@@ -1,0 +1,11 @@
+/target
+Cargo.lock
+*.wav
+!tests/fixtures/*.wav
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+input.wav
+output.wav

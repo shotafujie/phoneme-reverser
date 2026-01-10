@@ -1,0 +1,12 @@
+[project]
+name = "phoneme-reverser-py"
+version = "0.1.0"
+description = "Python dependencies for phoneme-reverser"
+dependencies = [
+    "allosaurus>=1.0.0",
+    "lexconvert>=1.2.0",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
