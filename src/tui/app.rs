@@ -1,7 +1,7 @@
 use crate::converter::PhonemeConverter;
 use crate::error::Result;
 use crate::playback::AudioPlayer;
-use crate::synth::{synthesize_phonemes, SynthConfig};
+use crate::synth::{synthesize_phonemes, Language, SynthConfig};
 use crate::tui::phoneme_db::{Phoneme, PhonemeDatabase};
 use chrono::Local;
 use std::path::PathBuf;
@@ -78,6 +78,17 @@ impl App {
 
     pub fn quit(&mut self) {
         self.should_quit = true;
+    }
+
+    pub fn toggle_language(&mut self) {
+        self.synth_config.language = match self.synth_config.language {
+            Language::Japanese => Language::English,
+            Language::English => Language::Japanese,
+        };
+    }
+
+    pub fn current_language(&self) -> Language {
+        self.synth_config.language
     }
 
     pub fn play_original(&mut self) -> Result<()> {
@@ -270,5 +281,23 @@ mod tests {
 
         app.quit();
         assert!(app.should_quit);
+    }
+
+    #[test]
+    fn test_default_language_is_japanese() {
+        let app = App::new().unwrap();
+        assert_eq!(app.current_language(), Language::Japanese);
+    }
+
+    #[test]
+    fn test_toggle_language() {
+        let mut app = App::new().unwrap();
+        assert_eq!(app.current_language(), Language::Japanese);
+
+        app.toggle_language();
+        assert_eq!(app.current_language(), Language::English);
+
+        app.toggle_language();
+        assert_eq!(app.current_language(), Language::Japanese);
     }
 }

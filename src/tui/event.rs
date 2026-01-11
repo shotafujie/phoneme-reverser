@@ -21,6 +21,7 @@ fn handle_key_event(app: &mut App, key: KeyEvent) {
 fn handle_phoneme_selection_keys(app: &mut App, key: KeyEvent) {
     match key.code {
         KeyCode::Char('q') => app.quit(),
+        KeyCode::Char('l') => app.toggle_language(),
         KeyCode::Char(c) => app.select_phoneme(c),
         KeyCode::Backspace => app.delete_last_phoneme(),
         KeyCode::Enter => {
@@ -35,6 +36,7 @@ fn handle_phoneme_selection_keys(app: &mut App, key: KeyEvent) {
 fn handle_preview_keys(app: &mut App, key: KeyEvent) {
     match key.code {
         KeyCode::Char('q') => app.quit(),
+        KeyCode::Char('l') => app.toggle_language(),
         KeyCode::Esc => app.toggle_view(),
         KeyCode::Char('p') => {
             if let Err(e) = app.play_original() {

@@ -124,7 +124,8 @@ fn render_phoneme_selection(frame: &mut Frame, app: &App) {
     frame.render_widget(selected_list, content_chunks[2]);
 
     // ステータスバー
-    let status_text = format!("Status: Ready  |  [q] Quit");
+    let language = app.current_language();
+    let status_text = format!("Language: {}  |  [l] Switch  |  [q] Quit", language.display_name());
     let status = Paragraph::new(status_text)
         .style(Style::default().fg(Color::White))
         .alignment(Alignment::Left)
@@ -197,7 +198,8 @@ fn render_preview(frame: &mut Frame, app: &App) {
     frame.render_widget(content, chunks[1]);
 
     // ステータスバー
-    let status_text = "[Esc] Back  |  [q] Quit";
+    let language = app.current_language();
+    let status_text = format!("Language: {}  |  [l] Switch  |  [Esc] Back  |  [q] Quit", language.display_name());
     let status = Paragraph::new(status_text)
         .style(Style::default().fg(Color::White))
         .alignment(Alignment::Left)
