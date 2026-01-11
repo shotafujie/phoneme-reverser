@@ -1,4 +1,4 @@
-use crate::error::{PhonemeReverserError, Result};
+use crate::error::Result;
 use std::path::Path;
 
 pub struct AudioData {
