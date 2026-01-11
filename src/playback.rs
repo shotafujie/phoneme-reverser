@@ -13,16 +13,29 @@ impl AudioPlayer {
     }
 
     pub fn play(&self, audio: &AudioData) -> Result<()> {
+        eprintln!("[PLAYBACK] Starting playback...");
+        eprintln!("[PLAYBACK] Audio info: sample_rate={}, channels={}, samples={}",
+                  audio.sample_rate, audio.channels, audio.samples.len());
+
         // 1. デフォルトホストとデバイスを取得
         let host = cpal::default_host();
         let device = host
             .default_output_device()
             .ok_or_else(|| PhonemeReverserError::AudioPlayback("No output device available".to_string()))?;
 
-        // 2. サポートされている設定を取得
-        let config = device
+        eprintln!("[PLAYBACK] Output device: {:?}", device.name());
+
+        // 2. オーディオデータのサンプルレートに合わせた設定を使用
+        let mut config: cpal::StreamConfig = device
             .default_output_config()
-            .map_err(|e| PhonemeReverserError::AudioPlayback(format!("Failed to get default config: {}", e)))?;
+            .map_err(|e| PhonemeReverserError::AudioPlayback(format!("Failed to get default config: {}", e)))?
+            .into();
+
+        // サンプルレートを音声データに合わせる
+        config.sample_rate = cpal::SampleRate(audio.sample_rate);
+        config.channels = audio.channels;
+
+        eprintln!("[PLAYBACK] Config: sample_rate={}, channels={}", config.sample_rate.0, config.channels);
 
         // 3. サンプルデータをクローン
         let samples = audio.samples.clone();
@@ -34,10 +47,7 @@ impl AudioPlayer {
         let sample_idx_clone = sample_idx.clone();
 
         // 4. 出力ストリームのコールバック
-        let stream = match config.sample_format() {
-            cpal::SampleFormat::F32 => {
-                let config: cpal::StreamConfig = config.into();
-                device
+        let stream = device
                     .build_output_stream(
                         &config,
                         move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
@@ -62,24 +72,20 @@ impl AudioPlayer {
                         |err| eprintln!("Stream error: {}", err),
                         None,
                     )
-                    .map_err(|e| PhonemeReverserError::AudioPlayback(format!("Failed to build stream: {}", e)))?
-            }
-            _ => {
-                return Err(PhonemeReverserError::AudioPlayback(
-                    "Unsupported sample format (only F32 is supported)".to_string(),
-                ))
-            }
-        };
+                    .map_err(|e| PhonemeReverserError::AudioPlayback(format!("Failed to build stream: {}", e)))?;
 
         // 5. ストリームを再生
+        eprintln!("[PLAYBACK] Starting stream...");
         stream
             .play()
             .map_err(|e| PhonemeReverserError::AudioPlayback(format!("Failed to play stream: {}", e)))?;
 
         // 6. 再生完了まで待機
         let duration_secs = total_samples as f32 / (audio.sample_rate * channels as u32) as f32;
+        eprintln!("[PLAYBACK] Playing for {:.2} seconds...", duration_secs);
         std::thread::sleep(std::time::Duration::from_secs_f32(duration_secs + 0.5));
 
+        eprintln!("[PLAYBACK] Playback complete!");
         Ok(())
     }
 }
