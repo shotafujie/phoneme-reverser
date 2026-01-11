@@ -208,7 +208,7 @@ fn render_preview(frame: &mut Frame, app: &App) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ratatui::layout::Constraint;
+    use ratatui::layout::{Constraint, Rect};
 
     #[test]
     fn test_layout_calculation() {
