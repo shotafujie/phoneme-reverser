@@ -157,16 +157,20 @@ impl App {
         // IPA → eSpeak変換
         let espeak_phonemes = self.converter.convert_ipa_to_espeak(&ipa_phonemes)?;
 
+        // wav/ディレクトリを作成（存在しない場合）
+        let wav_dir = PathBuf::from("wav");
+        std::fs::create_dir_all(&wav_dir)?;
+
         // タイムスタンプ形式のファイル名を生成
         let timestamp = Local::now().format("%Y%m%d%H%M%S").to_string();
         let filename = format!("{}.wav", timestamp);
-        let output_path = PathBuf::from(&filename);
+        let output_path = wav_dir.join(&filename);
 
         // 音声合成
         synthesize_phonemes(&espeak_phonemes, &output_path, &self.synth_config)?;
 
         self.playback_status = PlaybackStatus::Idle;
-        Ok(filename)
+        Ok(format!("wav/{}", filename))
     }
 }
 
